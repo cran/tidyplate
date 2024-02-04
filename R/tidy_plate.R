@@ -38,9 +38,9 @@ tidy_plate <- function(file, well_id = "well", sheet = 1) {
   }
 
   # Extract file name
-  file_name <- sub("(.*\\/)([^.]+)(\\.[[:alnum:]]+$)", "\\2", file)
+  # file_name <- sub("(.*\\/)([^.]+)(\\.[[:alnum:]]+$)", "\\2", file)
   file_ext <- tools::file_ext(file)
-  file_full_name <- paste(file_name, file_ext, sep = ".")
+  file_full_name <- basename(file)
 
   # Check if file exists
   if (!(file.exists(file))) {
@@ -53,7 +53,7 @@ tidy_plate <- function(file, well_id = "well", sheet = 1) {
   } else if (tools::file_ext(file) == "xlsx") {
     suppressMessages(raw_data <- readxl::read_excel(file, col_names = FALSE, sheet = sheet))
   } else {
-    suppressMessages(raw_data <- readr::read_csv(file, col_names = FALSE))
+    suppressMessages(raw_data <- readr::read_csv(file, col_names = FALSE, show_col_types = FALSE))
   }
 
   # Check if file is empty
@@ -179,11 +179,15 @@ tidy_plate <- function(file, well_id = "well", sheet = 1) {
   # Remove NAs in all rows (except well/ first column)
   final_data <- final_data_list |>
     purrr::map(naming_cols, well_id) |>
-    purrr::reduce(dplyr::full_join, by = well_id) |>
-    dplyr::filter(!dplyr::if_all(-well_id, is.na)) |>
+    purrr::reduce(dplyr::full_join, by = well_id)
+
+  final_data_no_na <- final_data[!apply(final_data[-1], 1, \(x) all(is.na(x))),] |>
     utils::type.convert(as.is = TRUE)
+
+   # dplyr::filter(!dplyr::if_all(-well_id, is.na)) |>
+   # utils::type.convert(as.is = TRUE)
 
   # Return data with plate type
   message(paste("Data: ", file_full_name, "; Plate type: ", plate_parameters[[3]], " well plate", sep = ""))
-  return(tibble::tibble(final_data))
+  return(tibble::tibble(final_data_no_na))
 }

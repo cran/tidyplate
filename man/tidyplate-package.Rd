@@ -4,7 +4,7 @@
 \name{tidyplate-package}
 \alias{tidyplate}
 \alias{tidyplate-package}
-\title{tidyplate: Transform Microplates into a Tidy Dataframe}
+\title{tidyplate: Transform Microplate Data into Tidy Dataframes}
 \description{
 The goal of 'tidyplate' is to help researchers convert different types of microplates into tidy dataframes which can be used in data analysis. It accepts xlsx and csv files formatted in a specific way as input. It supports all types of standard microplate formats such as 6-well, 12-well, 24-well, 48-well, 96-well, 384-well, and, 1536-well plates.
 }
@@ -12,7 +12,7 @@ The goal of 'tidyplate' is to help researchers convert different types of microp
 Useful links:
 \itemize{
   \item \url{https://github.com/shubhamdutta26/tidyplate}
-  \item \url{http://www.shubhamdutta.com/tidyplate/}
+  \item \url{https://www.shubhamdutta.com/tidyplate/}
   \item Report bugs at \url{https://github.com/shubhamdutta26/tidyplate/issues}
 }
 
