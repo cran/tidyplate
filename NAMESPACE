@@ -2,4 +2,6 @@
 
 export(check_plate)
 export(tidy_plate)
+export(view_plate_names)
 importFrom(rlang,":=")
+importFrom(utils,write.table)
