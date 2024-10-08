@@ -424,7 +424,7 @@ using the <code>build_plate</code> function:</p>
 <p>If you want to retrieve the names of individual plates:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">view_plate_names</span>(file)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;drug&quot;             &quot;cell_line&quot;        &quot;percent_survived&quot;</span></span></code></pre></div>
-<p>Import the file as a tibble:</p>
+<p>Read and import the file as a tibble:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">tidy_plate</span>(file)</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; Data: example_12_well.xlsx; Plate type: 12-well plate</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">head</span>(data)</span>
