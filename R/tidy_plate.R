@@ -1,11 +1,18 @@
 #' Reads and transforms microwell plate to a tibble
 #'
+#' @description
+#' `tidy_plate()` reads a microwell plate shaped csv or excel file and returns
+#' a tibble for downstream data analysis. In order to create an template file
+#' use the `build_plate()` function.
+#'
 #' @param file A character string containing the path to a csv or excel file.
 #' The format is described below.
 #' @param well_id A character string that will be the name for the well id
 #' column.
 #' @param sheet A character or integer indicating the excel sheet to be
 #' read.
+#'
+#' @seealso [build_plate()], [generate_plate()]
 #'
 #' @return A tibble.
 #' @export
@@ -24,30 +31,31 @@ tidy_plate <- function(file,
   # Check whether function arguments are valid----
   ## One file should be provided----
   if (length(file) != 1) {
-    stop(
+    rlang::abort(
       paste0(
         "Invalid input: ",
         ifelse(length(file) > 1,
                "More than one file provided."
         )
       ),
-      call. = FALSE
+      call = NULL
     )
   }
 
   ## `well_id` should be a character vector of length 1----
   if (!is.character(well_id) || length(well_id) != 1L) {
-    stop("`well_id` should be a character vector of length 1", call. = FALSE)
+    rlang::abort("`well_id` should be a single character string.",
+                 call = NULL)
+  }
+
+  ## Check if file exists----
+  if (!(file.exists(file))) {
+    rlang::abort("File does not exist!", call = NULL)
   }
 
   ## Read file ext and basename----
   # file_ext <- tolower(tools::file_ext(file))
   file_full_name <- basename(file)
-
-  ## Check if file exists----
-  if (!(file.exists(file))) {
-    stop(paste0(file_full_name, " does not exist!"), call. = FALSE)
-  }
 
   # Read data----
   raw_data <- read_data(file = file, sheet = sheet)
@@ -62,7 +70,7 @@ tidy_plate <- function(file,
                                   count_columns ,
                                   count_rows_actual,
                                   well_id,
-                                  file_full_name)[[1]]
+                                  file_full_name)
 
   # Final transformation----
 
@@ -97,14 +105,14 @@ tidy_plate <- function(file,
     if (nrow(plate) > 0) {
       # Create well identifiers and values in one go
       num_cols <- ncol(plate) - 1
-      zwellsx <- paste0(rep(plate$row, each = num_cols), sprintf("%02d", rep(1:num_cols, times = nrow(plate))))
+      XJvRpf03oP_59 <- paste0(rep(plate$row, each = num_cols), sprintf("%02d", rep(1:num_cols, times = nrow(plate))))
 
       # Flatten the plate values and replace empty strings with NA
       values <- as.vector(t(plate[, -1]))
       values[values == ""] <- NA
 
       # Create long format data frame directly
-      long_plate <- data.frame(zwellx = zwellsx, value = values)
+      long_plate <- data.frame(Z3Y2Bo1hyt_7 = XJvRpf03oP_59, value = values)
 
       # Add to the pre-allocated list at the correct index
       reformatted_data[[i]] <- long_plate
@@ -123,12 +131,12 @@ tidy_plate <- function(file,
     for (i in seq_along(reformatted_data)[-1]) {
       new_data <- reformatted_data[[i]]
       colnames(new_data)[2] <- names(reformatted_data)[i]
-      final_data <- merge(final_data, new_data, by = "zwellx", all = TRUE)
+      final_data <- merge(final_data, new_data, by = "Z3Y2Bo1hyt_7", all = TRUE)
     }
   }
 
   # Sort the dataframe by well
-  final_data <- final_data[order(final_data$zwellx), ]
+  final_data <- final_data[order(final_data$Z3Y2Bo1hyt_7), ]
   # Rename the first column
   colnames(final_data)[1] <- well_id
 
@@ -138,8 +146,8 @@ tidy_plate <- function(file,
   )
 
 
-  message(paste("Data: ", file_full_name,
-                "; Plate type: ", plate_parameters[[3]],
-                "-well plate", sep = ""))
+  rlang::inform(
+      paste0("Plate type: ", plate_parameters[[3]], "-well")
+  )
   return(tibble::tibble(final_data_no_na))
 }

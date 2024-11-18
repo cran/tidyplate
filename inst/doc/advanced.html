@@ -12,7 +12,7 @@
 
 
 
-<title>Transform microwell plates with tidyplate</title>
+<title>Read data from several files using tidyplate</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -336,76 +336,62 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Transform microwell plates with
+<h1 class="title toc-ignore">Read data from several files using
 <code>tidyplate</code></h1>
 
 
 
-<div id="formating-the-input-data" class="section level2">
-<h2>Formating the input data</h2>
-<p>The input xlsx or csv should be formatted in a specific way:</p>
-<ul>
-<li>Top left corner must hold the name for that plate.</li>
-<li>Column names should be: 1, 2, 3, and so on and so forth.</li>
-<li>Row names should be: A, B, C, and so on and so forth.</li>
-<li>There must be an empty row between each plate.</li>
-</ul>
-</div>
-<div id="usage" class="section level2">
-<h2>Usage</h2>
-<p>If the input file is an xlsx file it reads the first sheet by
-default. Users can specify sheet using the <code>sheet</code> argument
-for an xlsx file. Users can also specify the variable name of column
-where well ids will be stored (defaults to “well”). Please make sure
-that <code>well_id</code> argument does not match individual plate names
-in the input file.</p>
 <p>Start by loading tidyplate:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyplate)</span></code></pre></div>
-<p>First check if the input file is valid or not:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(tidyplate)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, </span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                    <span class="st">&quot;example_12_well.xlsx&quot;</span>, </span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                    <span class="at">package =</span> <span class="st">&quot;tidyplate&quot;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">check_plate</span>(file) <span class="co"># No error for valid file</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; example_12_well.xlsx: OK; Plate type: 12-well</span></span>
+<p>Import multiple csv files into separate tibbles:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                    <span class="st">&quot;example_12_well.xlsx&quot;</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                    <span class="at">package =</span> <span class="st">&quot;tidyplate&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>csv_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> file, </span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                        <span class="at">pattern =</span> <span class="st">&quot;*.csv&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                        <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>incorrect_file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>                              <span class="st">&quot;incorrect_format.csv&quot;</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                              <span class="at">package =</span> <span class="st">&quot;tidyplate&quot;</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">check_plate</span>(incorrect_file) <span class="co"># Error type displayed</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Error:</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; ! Verify row and column ids in incorrect_format.csv.</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; ℹ Expected column ids: 1, 2, 3, and so on.</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; ℹ Expected row ids: A, B, C, and so on.</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; ℹ Use the `build_plate()` function to build an empty template.</span></span></code></pre></div>
-<p>As mentioned above, the formatting of the input file is very
-important. A csv or excel template for each plate type can be created
-using the <code>build_plate</code> function:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">build_plate</span>(<span class="at">plate_type =</span> <span class="dv">96</span>, </span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>            <span class="at">n_plates =</span> <span class="dv">2</span>, </span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>            <span class="at">file_type =</span> <span class="st">&quot;xlsx&quot;</span>) <span class="co"># default is csv</span></span></code></pre></div>
-<p>If you want to retrieve the names of individual plates:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">view_plate_names</span>(file)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;drug&quot;             &quot;cell_line&quot;        &quot;percent_survived&quot;</span></span></code></pre></div>
-<p>Read and import the file as a tibble:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">tidy_plate</span>(file)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; Plate type: 12-well</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">head</span>(data)</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 4</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;   well  drug      cell_line percent_survived</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;                &lt;int&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; 1 A01   Neomycin  HEK293                  60</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 2 A02   Puromycin HEK293                  NA</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 3 A03   Neomycin  Hela                    52</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 4 A04   Puromycin Hela                    18</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 5 B01   Neomycin  HEK293                  62</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 6 B02   Puromycin HEK293                  23</span></span></code></pre></div>
-<p>Conversely, a dataframe or tibble can be re-exported back to a plate
-shaped csv or xlsx file:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">generate_plate</span>(data, <span class="at">well_id =</span> <span class="st">&quot;well&quot;</span>, <span class="at">plate_type =</span> <span class="dv">12</span>, <span class="at">file =</span> <span class="st">&quot;plate.csv&quot;</span>)</span></code></pre></div>
-<p>For more information on how to use functions on multiple files or
-multi-sheet excel files read the <code>vignette(&quot;advanced&quot;)</code>.</p>
-</div>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>names <span class="ot">&lt;-</span> tools<span class="sc">::</span><span class="fu">file_path_sans_ext</span>(<span class="fu">basename</span>(csv_files))</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># Loop through the filenames and assign data</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_along</span>(csv_files)) {</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="fu">assign</span>(names[i], <span class="fu">tidy_plate</span>(csv_files[i]))</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>}</span></code></pre></div>
+<p>Import multiple csv files as a <strong>list</strong> of tibbles:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Initialize an empty list to store tibbles for each file</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>tb_csv_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Loop through the filenames and assign data</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_along</span>(csv_files)) {</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  tb_csv_list[[i]] <span class="ot">&lt;-</span> <span class="fu">tidy_plate</span>(csv_files[i])</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>}</span></code></pre></div>
+<p>For multiple excel sheets in the same excel file:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># as individual tibbles</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>xl_file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                       <span class="st">&quot;multisheet_example.xlsx&quot;</span>, </span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                       <span class="at">package =</span> <span class="st">&quot;tidyplate&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>sheets <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">excel_sheets</span>(xl_file)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="cf">for</span> (sheet <span class="cf">in</span> sheets) {</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  tb <span class="ot">&lt;-</span> <span class="fu">tidy_plate</span>(xl_file, <span class="at">sheet =</span> sheet)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  name <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;tb_&quot;</span>, sheet)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="fu">assign</span>(name, tb)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>}</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; Plate type: 6-well</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; Plate type: 12-well</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; Plate type: 12-well</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co"># as elements of a list</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co"># Initialize an empty list to store tibbles for each sheet</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>tb_xl_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="cf">for</span> (sheet <span class="cf">in</span> sheets) {</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>  tb_xl_list[[sheet]] <span class="ot">&lt;-</span> <span class="fu">tidy_plate</span>(xl_file, <span class="at">sheet =</span> sheet)</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>}</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; Plate type: 6-well</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt; Plate type: 12-well</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; Plate type: 12-well</span></span></code></pre></div>
 
 
 
