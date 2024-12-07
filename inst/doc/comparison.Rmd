@@ -1,0 +1,27 @@
+---
+title: "Speed comparison with `plater::read_plate()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Speed comparison with `plater::read_plate()`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  dpi = 300
+)
+```
+
+The `plater` package was an inspiration for me to write `tidyplate`. There are two issues with `plater::read_plate()` function that I wanted to fix. These are:
+
+1.  Performance.
+2.  Incompatibility with excel files.
+
+`tidyplate::tidy_plate()` can accept excel files as input and after running several performance tests I can say that `tidyplate::tidy_plate()` was significantly faster than `plater::read_plate()`. The benchmarking code is in the `inst` folder.
+
+![comparison_boxplot](images/comparison_plot.png){width="900"}

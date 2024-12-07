@@ -1,5 +1,12 @@
 # tidyplate 2.2.0
 
+# tidyplate 2.2.0 (development version)
+
+### Minor changes
+-   Fixed type mismatch in plate validation when comparing column identifiers.
+-   Added vignette with `plater::read_plate()` comparison.
+-   Added comparison code in `inst` folder.
+
 # tidyplate 2.1.0
 
 ### New features

@@ -1,7 +1,7 @@
 Type: Package
 Package: tidyplate
 Title: Transform Microplate Data into Tibbles
-Version: 2.1.0
+Version: 2.2.0
 Authors@R: 
     person("Shubham", "Dutta", , "shubhamdutta26@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-8484-0717"))
@@ -25,7 +25,7 @@ Encoding: UTF-8
 Language: en-US
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2024-11-18 19:15:06 UTC; shubham
+Packaged: 2024-12-06 19:20:19 UTC; shubham
 Author: Shubham Dutta [aut, cre, cph] (<https://orcid.org/0000-0001-8484-0717>)
 Repository: CRAN
-Date/Publication: 2024-11-18 23:50:04 UTC
+Date/Publication: 2024-12-07 00:20:03 UTC
